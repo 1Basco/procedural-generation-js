@@ -67,13 +67,10 @@ export function generateProceduralGrid(
 
     const { x, y } = lastCell ?? { x: 0, y: 0 };
 
-    let actualCell;
     // get the next cell
     if (x + 1 < grid.length) {
-      actualCell = grid[x + 1][y];
       findSuitableElement(x + 1, y);
     } else if (y + 1 < grid[0].length) {
-      actualCell = grid[0][y + 1];
       findSuitableElement(0, y + 1);
     }
   }
