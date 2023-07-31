@@ -1,8 +1,54 @@
 export function generateProceduralGrid(
   grid: (string | undefined)[][],
-  elementTypes: any[],
-  adjacencyRules: { [x: string]: string[] }
+  elementTypes: string[],
+  adjacencyRules: { [x: string]: string[] },
+  seed?: string
 ) {
+  function getRandomSeed() {
+    const characters =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let seed = "";
+    const seedLength = 10; // Set the desired seed length
+    for (let i = 0; i < seedLength; i++) {
+      seed += characters[Math.floor(Math.random() * characters.length)];
+    }
+    return seed;
+  }
+
+  function hashCode(str: string) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+      hash |= 0; // Convert to 32bit integer
+    }
+    return Math.abs(hash);
+  }
+
+  function seedRandom(seed: string) {
+    const numericalSeed = hashCode(seed);
+
+    let m_w = numericalSeed;
+    let m_z = 987654321;
+
+    // Returns a random number between 0 (inclusive) and 1 (exclusive)
+    return function random() {
+      m_z = (36969 * (m_z & 65535) + (m_z >> 16)) & 0x7fffffff;
+      m_w = (18000 * (m_w & 65535) + (m_w >> 16)) & 0x7fffffff;
+      let result = ((m_z << 16) + m_w) & 0x7fffffff;
+      result /= 0x80000000;
+      return result;
+    };
+  }
+
+  const generatedSeed = seed ?? getRandomSeed();
+
+  const randomVal = seedRandom(String(generatedSeed));
+
+  function getRandom() {
+    return randomVal(); // Use the custom random function
+  }
+
   function getNeighbors(x: number, y: number) {
     const neighbors = [];
     if (x > 0) neighbors.push(grid[x - 1][y]);
@@ -22,15 +68,16 @@ export function generateProceduralGrid(
 
   function shuffleArray(array: any[]) {
     for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
+      const j = Math.floor(getRandom() * (i + 1));
       [array[i], array[j]] = [array[j], array[i]];
     }
   }
 
   const startX = 0; // Always start from the top left corner
   const startY = 0; // Always start from the top left corner
+
   const startElementType =
-    elementTypes[Math.floor(Math.random() * elementTypes.length)];
+    elementTypes[Math.floor(getRandom() * elementTypes.length)];
 
   grid[startX][startY] = startElementType;
 
@@ -39,7 +86,7 @@ export function generateProceduralGrid(
 
   function findSuitableElement(x: number, y: number) {
     const neighbors = getNeighbors(x, y);
-    if (Math.floor(Math.random() * 10) < 7) {
+    if (Math.floor(getRandom() * 10) < 7) {
       //water percentage
       shuffleArray(elementTypes);
     } else {
@@ -74,5 +121,6 @@ export function generateProceduralGrid(
       findSuitableElement(0, y + 1);
     }
   }
-  return grid;
+
+  return { grid, seed: generatedSeed };
 }

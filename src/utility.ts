@@ -20,7 +20,12 @@ const createEmptyGrid = () => {
 
 const emptyGrid = createEmptyGrid();
 
-export const grid: (string | undefined)[][] = generateProceduralGrid(
+interface ProceduralGrid {
+  grid: (string | undefined)[][];
+  seed: string;
+}
+
+export const { grid, seed }: ProceduralGrid = generateProceduralGrid(
   emptyGrid,
   elementTypes,
   adjacencyRules
