@@ -20,6 +20,10 @@ const createEmptyGrid = () => {
 
 const emptyGrid = createEmptyGrid();
 
+// Pega a seed da URL (?seed=xxx) ou undefined para gerar uma nova
+const urlParams = new URLSearchParams(window.location.search);
+const seedParam = urlParams.get("seed") || undefined;
+
 interface ProceduralGrid {
   grid: (string | undefined)[][];
   seed: string;
@@ -28,7 +32,8 @@ interface ProceduralGrid {
 export const { grid, seed }: ProceduralGrid = generateProceduralGrid(
   emptyGrid,
   elementTypes,
-  adjacencyRules
+  adjacencyRules,
+  seedParam
 );
 
 // Canvas info
